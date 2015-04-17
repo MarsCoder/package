@@ -1,9 +1,9 @@
 /*
- * packet.cpp
- *
- *  Created on: Apr 13, 2015
- *      Author: mars
- */
+* packet.cpp
+*
+*  Created on: Apr 13, 2015
+*      Author: mars
+*/
 
 #include <string>
 #include <iostream>
@@ -40,14 +40,14 @@ packet::packet() {
 }
 
 packet::~packet() {
-	// TODO Auto-generated destructor stub
+// TODO Auto-generated destructor stub
 }
 
 //获得数据包指针
 void packet::getpacket()
 {
 	pPacket = recvQue.pop();
-	packet::count++;
+	packet::count++;	//记录抓到数据包的数量
 
 }
 
@@ -56,37 +56,38 @@ int packet::parseEthHead()
 {
 	etherHead = (struct ethhdr*) pPacket;
 
-	    if (0 == etherHead)
-	    {
-	        return -1;
-	    }
+	if (0 == etherHead)
+	{
+		return -1;
+	}
 
-	    std::cout << "Eth-Pk-Type:"
-	    		<< std::setw(5) << std::left << std::setfill(' ')<< std::hex
-				<< ntohs(etherHead->h_proto)
-				<<"("
-	    		<< opt.pairEthNameId(ntohs(etherHead->h_proto))
-				<< ") ";
-	    if(opt.pairEthNameId(ntohs(etherHead->h_proto)) == "unknow"){
-	    	return -1;
-	    }
-	    showMac(etherHead->h_source);	//源MAC地址
-	    std::cout << ">> " ;
-	    showMac(etherHead->h_dest);		//目的MAC地址
-	    std::cout << std::endl;
+	std::cout << "Eth-Pk-Type:"
+			<< std::setw(5) << std::left << std::setfill(' ')<< std::hex
+			<< ntohs(etherHead->h_proto)
+			<<"("
+			<< opt.pairEthNameId(ntohs(etherHead->h_proto))
+			<< ") ";
 
-	    return 0;
+	if(opt.pairEthNameId(ntohs(etherHead->h_proto)) == "unknow"){
+		return -1;
+	}
+	showMac(etherHead->h_source);	//源MAC地址
+	std::cout << " >> " ;
+	showMac(etherHead->h_dest);		//目的MAC地址
+	std::cout << std::endl;
+
+	return 0;
 }
 
 // 输出MAC地址
 void packet::showMac(const unsigned char* macAddr)
 {
-    for(int i = 0; i < (ETH_ALEN - 1); ++i)
-    {
-        std::cout << std::setw(2)<< std::hex << std::right << std::setfill('0')
-        	<< (unsigned short)macAddr[i] << ":";
-    }
-    std::cout << std::setw(2) << std::hex << (unsigned short)macAddr[ETH_ALEN-1];
+	for(int i = 0; i < (ETH_ALEN - 1); ++i)
+	{
+		std::cout << std::setw(2)<< std::hex << std::right << std::setfill('0')
+			<< (unsigned short)macAddr[i] << ":";
+	}
+	std::cout << std::setw(2) << std::hex << (unsigned short)macAddr[ETH_ALEN-1];
 }
 
 //解析IP层数据包首部
@@ -109,8 +110,8 @@ int packet::parseIpv4Head()
 	std::cout << " IpHeadSize:"
 			<< std::dec << (*ipHead).ihl * 4 ;	//协议头部长度
 	std::cout << " IpPacketSize:"
-				<< std::dec << std::setfill(' ') << std::right
-				<< ntohs((*ipHead).tot_len) ;			//ip数据包数据段长度
+			<< std::dec << std::setfill(' ') << std::right
+			<< ntohs((*ipHead).tot_len) ;			//ip数据包数据段长度
 	std::cout << " total recv " << packet::count <<" packet";
 	std::cout << std::endl;
 
@@ -168,16 +169,16 @@ int packet::parseUdpHead()
 		return -1;
 	}
 	std::cout << "UDP-Pk-Type:"	//协议类型
-				<< " SRT_PORT:"
-				<< std::dec << std::setw(5) << std::setfill(' ') << std::left
-				<< ntohs(udpHead->source)	//源端口
-				<< " DEST_PORT:"
-				<< ntohs(udpHead->dest)		//目的端口
-				<< " LEN:"
-				<< ntohs(udpHead->len)
-				<< " check:"
-				<< ntohs(udpHead->check)
-				<< std::endl << std::endl;
+			<< " SRT_PORT:"
+			<< std::dec << std::setw(5) << std::setfill(' ') << std::left
+			<< ntohs(udpHead->source)	//源端口
+			<< " DEST_PORT:"
+			<< ntohs(udpHead->dest)		//目的端口
+			<< " LEN:"
+			<< ntohs(udpHead->len)
+			<< " check:"
+			<< ntohs(udpHead->check)
+			<< std::endl << std::endl;
 
 	return 0;
 }
@@ -201,23 +202,23 @@ void packet::parsePacket()
 		//解析IP层首部部
 		switch(ntohs(etherHead->h_proto)){
 		case ETH_P_IP:
-			parseIpv4Head();
-			break;
+		parseIpv4Head();
+		break;
 		default:
-			std::cout << "unknow IP layer protocol " << std::endl;
-		}
+		std::cout << "unknow IP layer protocol " << std::endl;
+	}
 
-		//解析运输层首部
-		switch(ipHead->protocol){
+	//解析运输层首部
+	switch(ipHead->protocol){
 		case 6:
-			parseTcpHead();	//解析TCP报文首部
-			break;
+		parseTcpHead();	//解析TCP报文首部
+		break;
 		case 17:
-			parseUdpHead();//解析UDP报文首部
-			break;
+		parseUdpHead();//解析UDP报文首部
+		break;
 		default:
-			std::cout << "unknow transport layer protocol " << std::endl;
-			break;
+		std::cout << "unknow transport layer protocol " << std::endl;
+		break;
 		}
 	}
 	if(pPacket != NULL){

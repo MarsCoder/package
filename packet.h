@@ -1,9 +1,9 @@
 /*
- * packet.h
- *
- *  Created on: Apr 13, 2015
- *      Author: mars
- */
+* packet.h
+*
+*  Created on: Apr 13, 2015
+*      Author: mars
+*/
 
 #ifndef packet_H_
 #define packet_H_
